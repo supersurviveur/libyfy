@@ -1,0 +1,19 @@
+{
+    "files.associations": {
+        "stdio.h": "c",
+        "stdlib.h": "c",
+        "time.h": "c",
+        "libify.h": "c",
+        "array.h": "c",
+        "logging.h": "c",
+        "time_t.h": "c",
+        "endian.h": "c",
+        "stdarg.h": "c",
+        "exception.h": "c",
+        "ansi.h": "c",
+        "tests.h": "c",
+        "str.h": "c",
+        "stdint.h": "c",
+        "hashtable.h": "c"
+    }
+}

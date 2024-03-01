@@ -1,0 +1,1 @@
+gcc main.c src/*.c -g -o main -Wall -Wextra -Wshadow -Wpointer-arith -Wcast-qual -fsanitize=address,undefined -DLOG_DEBUG

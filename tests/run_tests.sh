@@ -1,0 +1,1 @@
+gcc *.c ../src/*.c -g -o tests -Wall -Wextra -fsanitize=address,undefined -DLOG_DEBUG && ./tests
