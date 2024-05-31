@@ -1,2 +1,0 @@
-gcc benchmark.c src/*.c -g -o benchmark -Wall -Wextra -fsanitize=address,undefined -DLOG_DEBUG
-gcc main.c src/*.c -g -o main -Wall -Wextra -fsanitize=address,undefined -DLOG_DEBUG

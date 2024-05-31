@@ -1,4 +1,6 @@
-main
-benchmark
 .vscode
+main
 tests/tests
+
+*.o
+*.a

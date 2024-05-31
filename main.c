@@ -1,15 +1,6 @@
 #include <stdio.h>
 
-#include "src/libify.h"
-
-CREATE_OPTION_TYPE(int)
-
-Option(int) divide(int a, int b) {
-    if (b == 0) {
-        return None(int);
-    }
-    return Some(int, a / b);
-}
+#include "libify.h"
 
 int main() {
     int *array = array_create(int);
@@ -31,9 +22,6 @@ int main() {
     TIME_END_S(1);
     // PANIC("This is a panic message"
 
-    Option(int) r = divide(10, 1);
-    int a = unwrap_option_or(r, 99);
-    INFO("a: %d", a);
     
     return 0;
 }
