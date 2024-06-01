@@ -1,9 +1,9 @@
 #include "tests.h"
 
-#include "../src/logging.h"
+#include "libyfy.h"
 
 int main() {
-    tests_array();
+    tests_vector();
     tests_hashtable();
     tests_linkedlist();
 

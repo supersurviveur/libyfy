@@ -1,11 +1,12 @@
 #ifndef LIBYFY_H
 #define LIBYFY_H
 
+#include "structures/vector.h"
+#include "structures/linkedlist.h"
+#include "structures/hashtable.h"
+
 #include "ansi.h"
 #include "logging.h"
 #include "exception.h"
-#include "array.h"
-#include "linkedlist.h"
-#include "hashtable.h"
 
 #endif // LIBYFY_H

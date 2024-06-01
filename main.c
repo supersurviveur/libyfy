@@ -3,13 +3,13 @@
 #include "libyfy.h"
 
 int main() {
-    int *array = array_create(int);
-    array_push(array, 23000);
-    array_push(array, 23010);
-    array_push(array, 25);
-    array_push(array, 34);
-    print_int_array(array, false);
-    array_free(array);
+    int *vector = vector_create(int);
+    vector_push(vector, 23000);
+    vector_push(vector, 23010);
+    vector_push(vector, 25);
+    vector_push(vector, 34);
+    print_int_vector(vector, false);
+    vector_free(vector);
 
     TIME_START(1);
     TRACE("Hello from main");

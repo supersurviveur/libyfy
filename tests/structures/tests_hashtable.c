@@ -1,4 +1,4 @@
-#include "../src/hashtable.h"
+#include "libyfy.h"
 
 typedef struct {
     int a;

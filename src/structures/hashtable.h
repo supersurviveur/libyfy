@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "exception.h"
+#include "../exception.h"
 #include "linkedlist.h"
 
 #define HASHTABLE_DEFAULT_CAPACITY 128

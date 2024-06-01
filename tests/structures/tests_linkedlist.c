@@ -1,5 +1,4 @@
-#include "../src/linkedlist.h"
-#include "../src/exception.h"
+#include "libyfy.h"
 
 void tests_linkedlist() {
     LinkedList *list = linkedlist_create(int);

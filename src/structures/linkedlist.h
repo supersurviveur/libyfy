@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "exception.h"
+#include "../exception.h"
 
 typedef struct _Node {
     void *data;
