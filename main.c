@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "libify.h"
+#include "libyfy.h"
 
 int main() {
     int *array = array_create(int);

@@ -1,28 +1,27 @@
 all: help
 
-FLAGS=-Wall -Wextra -Wshadow -Wpointer-arith -Wcast-qual
-DEBUG_FLAGS=$(FLAGS) -g
+FLAGS+=-Wall -Wextra -Wshadow -Wpointer-arith -Wcast-qual
 
 build:
 	gcc src/*.c src/*.h -c -O3 $(FLAGS)
 	make post
 	
 debug:
-	gcc src/*.c src/*.h -c -g $(DEBUG_FLAGS) -DLOG_DEBUG
+	gcc src/*.c src/*.h -c -g $(FLAGS) -DLOG_DEBUG
 	make post
 
 post:
-	ar rcs liblibify.a *.o
+	ar rcs liblibyfy.a *.o
 	rm src/*.gch
 
 run: debug
 run:
-	gcc main.c -o main -L. -Isrc -llibify -g $(DEBUG_FLAGS) -fsanitize=address,undefined
+	gcc main.c -o main -L. -Isrc -llibyfy -g $(FLAGS) -fsanitize=address,undefined
 	./main
 
 test: debug
 test:
-	gcc tests/*.c -o "tests/tests" -L. -Isrc -llibify -g $(DEBUG_FLAGS) -fsanitize=address,undefined -DLOG_DEBUG 
+	gcc tests/*.c -o "tests/tests" -L. -Isrc -llibyfy -g $(FLAGS) -fsanitize=address,undefined -DLOG_DEBUG 
 	./tests/tests
 
 clean:

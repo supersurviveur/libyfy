@@ -1,5 +1,5 @@
-#ifndef LIBIFY_H
-#define LIBIFY_H
+#ifndef LIBYFY_H
+#define LIBYFY_H
 
 #include "ansi.h"
 #include "logging.h"
@@ -8,4 +8,4 @@
 #include "linkedlist.h"
 #include "hashtable.h"
 
-#endif // LIBIFY_H
+#endif // LIBYFY_H
