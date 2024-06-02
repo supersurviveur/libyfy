@@ -1,5 +1,4 @@
-#ifndef HASHTABLE_H
-#define HASHTABLE_H
+#pragma once
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -89,5 +88,3 @@ void hashtable_free(HashTable *table);
 // Predefined hash functions
 uint32_t int_hash(const void *key);
 uint32_t cstr_hash(const void *key);
-
-#endif  // HASHTABLE_H

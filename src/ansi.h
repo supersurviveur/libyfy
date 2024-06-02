@@ -1,5 +1,4 @@
-#ifndef ANSI_H
-#define ANSI_H
+#pragma once
 
 #define RESET "\033[0m"
 #define BOLD "\033[1m"
@@ -32,5 +31,3 @@
 
 #define FG_RGB(r, g, b) "\033[38;2;" #r ";" #g ";" #b "m"
 #define BG_RGB(r, g, b) "\033[48;2;" #r ";" #g ";" #b "m"
-
-#endif  // ANSI_H

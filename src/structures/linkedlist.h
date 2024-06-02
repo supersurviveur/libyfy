@@ -1,5 +1,4 @@
-#ifndef LINKEDLIST_H
-#define LINKEDLIST_H
+#pragma once
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -135,5 +134,3 @@ LinkedListIterator linkedlist_iterator(LinkedList *list);
 /// @param iterator pointer to the iterator
 /// @return pointer to the next element
 void *linkedlist_iterator_next(LinkedListIterator *iterator);
-
-#endif  // LINKEDLIST_H

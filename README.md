@@ -10,6 +10,10 @@ Vector uses macro to change the variable pointer on push, pop, etc.. So keeping 
 
 ### LinkedList
 
+### Heap
+
+### BinaryTree
+
 ### HashTable
 TODO
 
@@ -25,7 +29,7 @@ ERROR("This is an error");
 TIME_END(1);
 PANIC("This is a panic");
 ```
-Variants with `_AT` suffix are also available, to specify the file and line number.
+Variants with `_AT` suffix are also available, to specify the file and line number. `NO_NL` are also available to avoid printing a newline at the end.
 `TRACE` and `DEBUG` only print if `-DLOG_DEBUG` or `-DLOG_TRACE` is passed.
 
 ### Ansi Colors

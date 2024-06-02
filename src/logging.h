@@ -1,5 +1,5 @@
-#ifndef LOGGING_H
-#define LOGGING_H
+#pragma once
+
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -130,5 +130,3 @@ void _log_msg(enum log_levels level, int line, const char *file, bool newline,
     _log_msg(LOG_LEVEL_INFO, __LINE__, __FILE__, true, \
              "Time taken for clock " #id ": %.3fs",    \
              ((double)clock() - _clock_##id) / (CLOCKS_PER_SEC));
-
-#endif  // LOGGING_H

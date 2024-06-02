@@ -1,4 +1,6 @@
-/// Resizable array of any type. Macros used replace the current pointer by another on resize, so keeping multiple pointers to the same vector is not safe
+/// Resizable array of any type. Macros used replace the current pointer by
+/// another on resize, so keeping multiple pointers to the same vector is not
+/// safe
 
 #pragma once
 
@@ -29,11 +31,11 @@ void *_vector_create(int stride);
 void *_vector_push(void *vector, void *value);
 void *_vector_pop(int line, const char *file, void *vector, void *value);
 void _vector_vector_pop_at(int line, const char *file, void *vector,
-                         uint32_t index, void *value);
+                           uint32_t index, void *value);
 void _print_vector(void *vector, bool beautify, bool logger,
-                  void (*print)(const void *), int line, const char *file);
-void _print_vector2d(void *vector, bool beautify,
-                    void (*print)(const void *), int line, const char *file);
+                   void (*print)(const void *), int line, const char *file);
+void _print_vector2d(void *vector, bool beautify, void (*print)(const void *),
+                     int line, const char *file);
 bool _vector_contains(void *vector, void *value);
 int32_t _vector_index_of(void *vector, void *value);
 void *_vector_concat(void *vector, void *other);
@@ -62,9 +64,9 @@ uint32_t vector_stride(void *vector);
 /// @brief Push a value to the vector
 /// @param vector pointer to the vector
 /// @param value value to push
-#define vector_push(vector, value)          \
-    {                                     \
-        typeof(value) tmp = value;        \
+#define vector_push(vector, value)           \
+    {                                        \
+        typeof(value) tmp = value;           \
         vector = _vector_push(vector, &tmp); \
     }
 
@@ -90,8 +92,8 @@ bool vector_is_empty(void *vector);
 /// @param vector pointer to the vector
 /// @param value value to check
 #define vector_contains(vector, value)  \
-    ({                                \
-        typeof(value) tmp = value;    \
+    ({                                  \
+        typeof(value) tmp = value;      \
         _vector_contains(vector, &tmp); \
     })
 
@@ -100,8 +102,8 @@ bool vector_is_empty(void *vector);
 /// @param value value to check
 /// @return `int32_t` - index of the value, -1 if not found
 #define vector_index_of(vector, value)  \
-    ({                                \
-        typeof(value) tmp = value;    \
+    ({                                  \
+        typeof(value) tmp = value;      \
         _vector_index_of(vector, &tmp); \
     })
 
@@ -118,8 +120,8 @@ void vector_map(void *vector, void (*map)(void *));
 /// @brief Sort the vector using quick sort
 /// @param vector pointer to the vector
 /// @param compare function to compare the elements
-void vector_quick_sort(void *vector, int (*compare)(const void *, const void *));
-
+void vector_quick_sort(void *vector,
+                       int (*compare)(const void *, const void *));
 
 /// @brief Print the vector
 /// @param vector pointer to the vector

@@ -1,5 +1,4 @@
-#ifndef PANIC_H
-#define PANIC_H
+#pragma once
 
 #include "logging.h"
 
@@ -28,5 +27,3 @@
     if (!(V)) {                            \
         PANIC("Assertion failed: %s", #V); \
     }
-
-#endif  // PANIC_H

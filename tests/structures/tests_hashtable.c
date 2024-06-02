@@ -6,7 +6,7 @@ typedef struct {
 } TestHashtable;
 
 uint32_t test_hashtable_hash(const void *key) {
-    return ((TestHashtable *)key)->a;
+    return ((const TestHashtable *)key)->a;
 }
 
 void tests_hashtable() {
