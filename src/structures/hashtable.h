@@ -7,7 +7,7 @@
 #include "../exception.h"
 #include "linkedlist.h"
 
-#define HASHTABLE_DEFAULT_CAPACITY 128
+#define HASHTABLE_DEFAULT_CAPACITY 2
 
 typedef struct {
     void *key;
@@ -20,12 +20,12 @@ typedef struct {
     uint32_t type_size;
     uint32_t length;
     uint32_t capacity;
-    uint32_t (*hash)(const void *);
+    uint32_t (*hash)(void *);
     LinkedList **buckets;
 } HashTable;
 
 HashTable *_hashtable_create(uint32_t key_size, uint32_t type_size,
-                             uint32_t (*hash)(const void *));
+                             uint32_t (*hash)(void *));
 void _hashtable_set(HashTable *table, void *key, void *value);
 void *_hashtable_get(HashTable *table, void *key);
 bool _hashtable_contains(HashTable *table, void *key);
@@ -74,7 +74,6 @@ void hashtable_free(HashTable *table);
         _hashtable_contains(table, &_key); \
     })
 
-
 /// @brief Delete a key from the hashtable
 /// @param table pointer to the hashtable
 /// @param key key to delete
@@ -84,7 +83,6 @@ void hashtable_free(HashTable *table);
         _hashtable_delete(table, &_key); \
     }
 
-
 // Predefined hash functions
-uint32_t int_hash(const void *key);
-uint32_t cstr_hash(const void *key);
+uint32_t int_hash(void *key);
+uint32_t cstr_hash(void *key);

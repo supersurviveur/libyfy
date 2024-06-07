@@ -1,7 +1,7 @@
 #include "hashtable.h"
 
 HashTable *_hashtable_create(uint32_t key_size, uint32_t type_size,
-                             uint32_t (*hash)(const void *)) {
+                             uint32_t (*hash)(void *)) {
     HashTable *table = malloc(sizeof(HashTable));
     if (table == NULL) {
         PANIC("Memory allocation failed");
@@ -9,7 +9,7 @@ HashTable *_hashtable_create(uint32_t key_size, uint32_t type_size,
     table->key_size = key_size;
     table->type_size = type_size;
     table->hash = hash;
-    table->buckets = malloc(sizeof(LinkedList) * HASHTABLE_DEFAULT_CAPACITY);
+    table->buckets = malloc(sizeof(LinkedList *) * HASHTABLE_DEFAULT_CAPACITY);
     if (table->buckets == NULL) {
         PANIC("Memory allocation failed");
     }
@@ -55,6 +55,30 @@ void _hashtable_set(HashTable *table, void *key, void *value) {
     memcpy(new_node.key, key, table->key_size);
     memcpy(new_node.value, value, table->type_size);
     table->length++;
+
+    // If length is above 75%, grow the table
+    if (table->length > table->capacity * 0.75) {
+        uint32_t old_capacity = table->capacity;
+        table->capacity *= 2;
+        LinkedList **old_buckets = table->buckets;
+        table->buckets = malloc(sizeof(LinkedList *) * table->capacity);
+        if (table->buckets == NULL) {
+            PANIC("Memory allocation failed");
+        }
+        for (uint32_t i = 0; i < table->capacity; i++) {
+            table->buckets[i] = linkedlist_create(HashNode);
+        }
+        for (uint32_t i = 0; i < old_capacity; i++) {
+            iterator = linkedlist_iterator(old_buckets[i]);
+            while ((node = linkedlist_iterator_next(&iterator)) != NULL) {
+                _hashtable_set(table, node->key, node->value);
+                free(node->key);
+                free(node->value);
+            }
+            linkedlist_free(old_buckets[i]);
+        }
+        free(old_buckets);
+    }
 }
 void *_hashtable_get(HashTable *table, void *key) {
     uint32_t index = table->hash(key) % table->capacity;
@@ -99,9 +123,9 @@ void _hashtable_delete(HashTable *table, void *key) {
 }
 
 // Hash functions
-uint32_t int_hash(const void *key) { return *(int *)key; }
-uint32_t cstr_hash(const void *key) {
-    const char *str = *(const char **)key;
+uint32_t int_hash(void *key) { return *(int *)key; }
+uint32_t cstr_hash(void *key) {
+    char *str = *(char **)key;
 
     unsigned long hash = 5381;
     int c;

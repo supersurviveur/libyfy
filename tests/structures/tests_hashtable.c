@@ -5,9 +5,7 @@ typedef struct {
     int b;
 } TestHashtable;
 
-uint32_t test_hashtable_hash(const void *key) {
-    return ((const TestHashtable *)key)->a;
-}
+uint32_t test_hashtable_hash(void *key) { return ((TestHashtable *)key)->a; }
 
 void tests_hashtable() {
     HashTable *table = hashtable_create(int, int, int_hash);
