@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.h": "c",
         "stdio.h": "c",
         "stdlib.h": "c",
         "time.h": "c",
@@ -14,6 +15,17 @@
         "tests.h": "c",
         "str.h": "c",
         "stdint.h": "c",
-        "hashtable.h": "c"
-    }
+        "hashtable.h": "c",
+        "string_view": "c",
+        "vector": "c",
+        "chrono": "c",
+        "text_encoding": "c",
+        "typeinfo": "c",
+        "array": "c",
+        "string": "c",
+        "span": "c"
+    },
+    "C_Cpp.default.compilerArgs": [
+        "-DVECTOR_TYPE=int"
+    ]
 }

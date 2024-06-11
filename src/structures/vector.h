@@ -1,8 +1,15 @@
-/// Resizable array of any type. Macros used replace the current pointer by
-/// another on resize, so keeping multiple pointers to the same vector is not
-/// safe
+/// Resizable array of any type.
 
-#pragma once
+#define VECTOR_DEFAULT_CAPACITY 2
+
+#ifndef VECTOR_TYPE
+#error "VECTOR_TYPE must be defined"
+#else
+
+#define TYPE__(pred, name, VECTOR) pred##VECTOR##name
+#define TYPE_(pred, name, VECTOR) TYPE__(pred, name, VECTOR)
+#define TYPE(name) TYPE_(vector_, name, VECTOR_TYPE)
+#define STYPE TYPE_(Vector_, , VECTOR_TYPE)
 
 #include <malloc.h>
 #include <memory.h>
@@ -13,182 +20,236 @@
 #include "../exception.h"
 #include "../logging.h"
 
-#define VECTOR_DEFAULT_CAPACITY 2
-#define VECTOR_OFFSET 16UL  // >= sizeof(VectorData), 16 to align properly
-
 /// @brief Struct to store the vector data, stored before the vector pointer
 /// @param length length of the vector
 /// @param capacity current capacity of the vector
-/// @param stride size of the type of elements of the vector
 typedef struct {
-    uint32_t length;
-    uint32_t capacity;
-    uint32_t stride;
-} VectorData;
-
-// Private functions
-void *_vector_create(int stride);
-void *_vector_push(void *vector, void *value);
-void *_vector_pop(int line, const char *file, void *vector, void *value);
-void _vector_vector_pop_at(int line, const char *file, void *vector,
-                           uint32_t index, void *value);
-void _print_vector(void *vector, bool beautify, bool logger,
-                   void (*print)(const void *), int line, const char *file);
-void _print_vector2d(void *vector, bool beautify, void (*print)(const void *),
-                     int line, const char *file);
-bool _vector_contains(void *vector, void *value);
-int32_t _vector_index_of(void *vector, void *value);
-void *_vector_concat(void *vector, void *other);
-
-/// @brief Free the vector
-/// @param vector pointer to the vector
-void vector_free(void *vector);
-
-/// @brief Get the length of the vector
-/// @param vector pointer to the vector
-uint32_t vector_length(void *vector);
-
-/// @brief Get the capacity of the vector
-/// @param vector pointer to the vector
-uint32_t vector_capacity(void *vector);
-
-/// @brief Get the type size of the vector
-/// @param vector pointer to the vector
-uint32_t vector_stride(void *vector);
+    size_t length;
+    size_t capacity;
+    VECTOR_TYPE *data;
+} STYPE;
 
 /// @brief Create an empty vector
-/// @param type type of the elements of the vector
-/// @return `void*` - pointer to the vector
-#define vector_create(type) _vector_create(sizeof(type))
+/// @return - the vector
+STYPE TYPE(_create)() {
+    VECTOR_TYPE *data = malloc(VECTOR_DEFAULT_CAPACITY * sizeof(VECTOR_TYPE));
+    if (data == NULL) {
+        PANIC("Memory allocation failed");
+    }
+
+    STYPE vector = {
+        .capacity = VECTOR_DEFAULT_CAPACITY, .data = data, .length = 0};
+
+    return vector;
+}
 
 /// @brief Push a value to the vector
 /// @param vector pointer to the vector
 /// @param value value to push
-#define vector_push(vector, value)           \
-    {                                        \
-        typeof(value) tmp = value;           \
-        vector = _vector_push(vector, &tmp); \
-    }
+void TYPE(_push)(STYPE *vector, VECTOR_TYPE value) {
+    if (vector->length >= vector->capacity) {
+        vector->capacity *= 2;
 
-/// @brief Pop a value from the vector
+        VECTOR_TYPE *newData =
+            realloc(vector->data, vector->capacity * sizeof(VECTOR_TYPE));
+        if (newData == NULL) {
+            PANIC("Memory allocation failed");
+        }
+
+        vector->data = newData;
+    }
+    memcpy(vector->data + vector->length, &value, sizeof(VECTOR_TYPE));
+    vector->length++;
+}
+
+/// @brief Free the vector
+/// @param vector pointer to the vector
+void TYPE(_free)(STYPE *vector) { free(vector->data); }
+
+/// @brief Pop the last value from the vector
 /// @param vector pointer to the vector
 /// @param value pointer to store the value
-#define vector_pop(vector, value) \
-    { vector = _vector_pop(__LINE__, __FILE__, vector, value); }
+void TYPE(_pop)(STYPE *vector, VECTOR_TYPE *value) {
+    if (vector->length == 0) {
+        PANIC("Vector is empty");
+    }
+    if (value != NULL) {
+        memcpy(value, (vector->data + (vector->length - 1)),
+               sizeof(VECTOR_TYPE));
+    }
+    vector->length--;
+}
 
 /// @brief Pop a value from the vector at a specific index
 /// @param vector pointer to the vector
 /// @param index index to pop
 /// @param value pointer to store the value
-#define vector_pop_at(vector, index, value) \
-    _vector_vector_pop_at(__LINE__, __FILE__, vector, index, value)
+void TYPE(_pop_at)(STYPE *vector, size_t index, VECTOR_TYPE *value) {
+    if (vector->length <= index) {
+        PANIC("Index out of bounds");
+    }
+    if (value != NULL) {
+        memcpy(value, (vector->data + index), sizeof(VECTOR_TYPE));
+    }
+    memmove(vector->data + index, vector->data + (index + 1),
+            (vector->length - index - 1) * sizeof(VECTOR_TYPE));
+    vector->length--;
+}
 
-/// @brief Check if the vector is empty
+void TYPE(_print_internal)(STYPE *vector, bool beautify, bool logger,
+                           void (*print)(const VECTOR_TYPE *)) {
+    if (logger) {
+        INFO_NO_NL("Length: %d -> ", vector->length);
+    }
+    printf("[");
+    if (beautify) {
+        printf("\n");
+    }
+    for (size_t i = 0; i < vector->length; i++) {
+        if (beautify) {
+            printf("  ");
+        }
+        print(vector->data + i);
+        if (i != vector->length - 1) {
+            if (beautify) {
+                printf(",\n");
+            } else {
+                printf(", ");
+            }
+        }
+    }
+    if (beautify) {
+        printf("\n");
+    }
+    printf("]");
+    if (logger) {
+        printf("\n");
+    }
+}
+
+/// @brief Print a vector
 /// @param vector pointer to the vector
-/// @return `bool` - true if the vector is empty, false otherwise
-bool vector_is_empty(void *vector);
+/// @param beautify if true, print the vector in a beautified way
+/// @param print function to print the elements
+void TYPE(_print)(STYPE *vector, bool beautify,
+                  void (*print)(const VECTOR_TYPE *)) {
+    TYPE(_print_internal)(vector, beautify, true, print);
+}
+
+/// @brief Print a 2D vector, not stable !
+/// @param vector pointer to the vector
+/// @param beautify if true, print the vector in a beautified way
+/// @param print function to print the elements
+void TYPE(_print2d)(void *vector, bool beautify,
+                    void (*print)(const VECTOR_TYPE *)) {
+    STYPE *vect = (STYPE *)vector;
+    INFO_NO_NL("Length: %d -> ", vect->length);
+    printf("[");
+    if (beautify) {
+        printf("\n");
+    }
+    for (size_t i = 0; i < vect->length; i++) {
+        if (beautify) {
+            printf("  ");
+        }
+        TYPE(_print_internal)
+        ((STYPE *)vect->data + i, false, false, print);
+        if (i != vect->length - 1) {
+            if (beautify) {
+                printf(",\n");
+            } else {
+                printf(", ");
+            }
+        }
+    }
+    if (beautify) {
+        printf("\n");
+    }
+    printf("]\n");
+}
 
 /// @brief Check if the vector contains a value
 /// @param vector pointer to the vector
 /// @param value value to check
-#define vector_contains(vector, value)  \
-    ({                                  \
-        typeof(value) tmp = value;      \
-        _vector_contains(vector, &tmp); \
-    })
+bool TYPE(_contains)(STYPE *vector, VECTOR_TYPE value) {
+    for (size_t i = 0; i < vector->length; i++) {
+        if (memcmp(vector->data + i, &value, sizeof(VECTOR_TYPE)) == 0) {
+            return true;
+        }
+    }
+    return false;
+};
 
 /// @brief Get the index of a value in the vector
 /// @param vector pointer to the vector
 /// @param value value to check
 /// @return `int32_t` - index of the value, -1 if not found
-#define vector_index_of(vector, value)  \
-    ({                                  \
-        typeof(value) tmp = value;      \
-        _vector_index_of(vector, &tmp); \
-    })
-
-/// @brief Map the vector using a function
-/// @param vector pointer to the vector
-/// @param map function to map the elements
-void vector_map(void *vector, void (*map)(void *));
+int32_t TYPE(_index_of)(STYPE *vector, VECTOR_TYPE value) {
+    for (size_t i = 0; i < vector->length; i++) {
+        if (memcmp(vector->data + i, &value, sizeof(VECTOR_TYPE)) == 0) {
+            return i;
+        }
+    }
+    return -1;
+};
 
 /// @brief Concatenate an vector to another
 /// @param vector pointer to the vector
 /// @param other pointer to the other vector
-#define vector_concat(vector, other) vector = _vector_concat(vector, other)
+void TYPE(_concat)(STYPE *vector, STYPE *other) {
+    for (size_t i = 0; i < other->length; i++) {
+        TYPE(_push)(vector, *(other->data + i));
+    }
+};
+
+/// @brief Map the vector using a function
+/// @param vector pointer to the vector
+/// @param map function to map the elements
+void TYPE(_map)(STYPE *vector, void (*map)(VECTOR_TYPE *)) {
+    for (size_t i = 0; i < vector->length; i++) {
+        map(vector->data + i);
+    }
+};
+
+int64_t TYPE(_partition)(STYPE *vector,
+                         int32_t (*compare)(const VECTOR_TYPE *,
+                                            const VECTOR_TYPE *),
+                         int64_t low, int64_t high) {
+    void *pivot = vector->data + high;
+    int64_t i = low - 1;
+    for (int64_t j = low; j < high; j++) {
+        if (compare(vector->data + j, pivot) < 0) {
+            i++;
+            VECTOR_TYPE tmp = vector->data[i];
+            vector->data[i] = vector->data[j];
+            vector->data[j] = tmp;
+        }
+    }
+    VECTOR_TYPE tmp = vector->data[i + 1];
+    vector->data[i + 1] = vector->data[high];
+    vector->data[high] = tmp;
+    return i + 1;
+}
+
+/// Recursive algorithm, edit the vector in place
+void TYPE(_quick_sort_)(STYPE *vector,
+                        int32_t (*compare)(const VECTOR_TYPE *,
+                                           const VECTOR_TYPE *),
+                        int64_t low, int64_t high) {
+    if (low < high) {
+        int64_t pi = TYPE(_partition)(vector, compare, low, high);
+        TYPE(_quick_sort_)(vector, compare, low, pi - 1);
+        TYPE(_quick_sort_)(vector, compare, pi + 1, high);
+    }
+}
 
 /// @brief Sort the vector using quick sort
 /// @param vector pointer to the vector
 /// @param compare function to compare the elements
-void vector_quick_sort(void *vector,
-                       int (*compare)(const void *, const void *));
+void TYPE(_quick_sort)(STYPE *vector, int32_t (*compare)(const VECTOR_TYPE *,
+                                                         const VECTOR_TYPE *)) {
+    TYPE(_quick_sort_)(vector, compare, 0, vector->length - 1);
+}
 
-/// @brief Print the vector
-/// @param vector pointer to the vector
-/// @param beautify if true, print the vector in a beautified way
-/// @param print function to print the elements
-#define print_vector(vector, beautify, print) \
-    _print_vector(vector, beautify, true, print, __LINE__, __FILE__)
-
-/// @brief Print the vector without logger
-/// @param vector pointer to the vector
-/// @param beautify if true, print the vector in a beautified way
-/// @param print function to print the elements
-#define print_vector_no_logger(vector, beautify, print) \
-    _print_vector(vector, beautify, false, print, __LINE__, __FILE__)
-
-/// @brief Print a 2D vector
-/// @param vector pointer to the vector
-/// @param beautify if true, print the vector in a beautified way
-/// @param print function to print the elements
-#define print_vector2d(vector, beautify, print) \
-    _print_vector2d(vector, beautify, print, __LINE__, __FILE__)
-
-void _print_int(const void *a);
-void _print_float(const void *a);
-void _print_double(const void *a);
-void _print_char(const void *a);
-
-/// @brief Print an vector of integers
-/// @param vector pointer to the vector
-/// @param beautify if true, print the vector in a beautified way
-#define print_int_vector(vector, beautify) \
-    print_vector(vector, beautify, _print_int)
-/// @brief Print a 2D vector of integers
-/// @param vector pointer to the vector
-/// @param beautify if true, print the vector in a beautified way
-#define print_int_vector2d(vector, beautify) \
-    print_vector2d(vector, beautify, _print_int)
-
-/// @brief Print an vector of floats
-/// @param vector pointer to the vector
-/// @param beautify if true, print the vector in a beautified way
-#define print_float_vector(vector, beautify) \
-    print_vector(vector, beautify, _print_float)
-/// @brief Print a 2D vector of floats
-/// @param vector pointer to the vector
-/// @param beautify if true, print the vector in a beautified way
-#define print_float_vector2d(vector, beautify) \
-    print_vector2d(vector, beautify, _print_float)
-
-/// @brief Print an vector of doubles
-/// @param vector pointer to the vector
-/// @param beautify if true, print the vector in a beautified way
-#define print_double_vector(vector, beautify) \
-    print_vector(vector, beautify, _print_double)
-/// @brief Print a 2D vector of doubles
-/// @param vector pointer to the vector
-/// @param beautify if true, print the vector in a beautified way
-#define print_double_vector2d(vector, beautify) \
-    print_vector2d(vector, beautify, _print_double)
-
-/// @brief Print an vector of characters
-/// @param vector pointer to the vector
-/// @param beautify if true, print the vector in a beautified way
-#define print_char_vector(vector, beautify) \
-    print_vector(vector, beautify, _print_char)
-/// @brief Print a 2D vector of characters
-/// @param vector pointer to the vector
-/// @param beautify if true, print the vector in a beautified way
-#define print_char_vector2d(vector, beautify) \
-    print_vector2d(vector, beautify, _print_char)
+#undef VECTOR_TYPE
+#endif
