@@ -1,7 +1,7 @@
 #include "binarytree.h"
 
-TreeNode *_tree_node_create(size_t stride, void *value) {
-    TreeNode *node = malloc(sizeof(TreeNode));
+BinaryTree *_binarytree_create(size_t stride, void *value) {
+    BinaryTree *node = malloc(sizeof(BinaryTree));
     if (node == NULL) {
         PANIC("Memory allocation failed");
     }
@@ -15,42 +15,26 @@ TreeNode *_tree_node_create(size_t stride, void *value) {
     return node;
 }
 
-void tree_node_free(TreeNode *node) {
+void binarytree_free(BinaryTree *node) {
     if (node->left != NULL) {
-        tree_node_free(node->left);
-        free(node->left);
+        binarytree_free(node->left);
     }
     if (node->right != NULL) {
-        tree_node_free(node->right);
-        free(node->right);
+        binarytree_free(node->right);
     }
     free(node->value);
+    free(node);
 }
 
-BinaryTree _binarytree_create(size_t stride) {
-    BinaryTree tree = {.root = NULL, .stride = stride};
-    return tree;
-}
-
-void binarytree_free(BinaryTree *tree) {
-    if (tree->root != NULL) {
-        tree_node_free(tree->root);
-        free(tree->root);
-    }
-}
-
-size_t binarytree_height_internal(TreeNode *tree) {
+uint64_t binarytree_height(BinaryTree *tree) {
     if (tree == NULL) return -1;
-    int a = binarytree_height_internal(tree->left);
-    int b = binarytree_height_internal(tree->right);
+    int a = binarytree_height(tree->left);
+    int b = binarytree_height(tree->right);
     return 1 + (a > b ? a : b);
 }
-size_t binarytree_height(BinaryTree *tree) {
-    return binarytree_height_internal(tree->root);
-}
 
-void print_binarytree_internal(void ***matrix, TreeNode *tree, int col, int row,
-                               int height) {
+void print_binarytree_internal(void ***matrix, BinaryTree *tree, int col,
+                               int row, int height) {
     if (tree == NULL) return;
     matrix[row][col] = tree->value;
 
@@ -87,7 +71,7 @@ void print_binarytree(BinaryTree *tree, void (*print)(void *), uint8_t width) {
         }
     }
     // Fill the matrix
-    print_binarytree_internal(matrix, tree->root, max_width / 2, 0, height);
+    print_binarytree_internal(matrix, tree, max_width / 2, 0, height);
 
     for (size_t i = 0; i < height + 1; i++) {
         size_t current_width = (height - 1) < i ? 0 : 1 << (height - 1 - i);

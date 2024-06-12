@@ -36,7 +36,10 @@
         "functional": "c",
         "tuple": "c",
         "type_traits": "c",
-        "utility": "c"
+        "utility": "c",
+        "any": "c",
+        "compare": "c",
+        "variant": "c"
     },
     "C_Cpp.default.compilerArgs": [
         "-DVECTOR_TYPE=int",
