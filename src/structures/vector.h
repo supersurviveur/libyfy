@@ -6,10 +6,10 @@
 #error "VECTOR_TYPE must be defined"
 #else
 
-#define TYPE__(pred, name, VECTOR) pred##VECTOR##name
-#define TYPE_(pred, name, VECTOR) TYPE__(pred, name, VECTOR)
-#define TYPE(name) TYPE_(vector_, name, VECTOR_TYPE)
-#define STYPE TYPE_(Vector_, , VECTOR_TYPE)
+#include "utils.h"
+
+#define TYPE(name) CONCAT(vec_, VECTOR_TYPE, name)
+#define STYPE CONCAT(Vec_, VECTOR_TYPE, )
 
 #include <malloc.h>
 #include <memory.h>
@@ -58,7 +58,7 @@ void TYPE(_push)(STYPE *vector, VECTOR_TYPE value) {
 
         vector->data = newData;
     }
-    memcpy(vector->data + vector->length, &value, sizeof(VECTOR_TYPE));
+    vector->data[vector->length] = value;
     vector->length++;
 }
 
@@ -68,32 +68,26 @@ void TYPE(_free)(STYPE *vector) { free(vector->data); }
 
 /// @brief Pop the last value from the vector
 /// @param vector pointer to the vector
-/// @param value pointer to store the value
-void TYPE(_pop)(STYPE *vector, VECTOR_TYPE *value) {
+VECTOR_TYPE TYPE(_pop)(STYPE *vector) {
     if (vector->length == 0) {
         PANIC("Vector is empty");
     }
-    if (value != NULL) {
-        memcpy(value, (vector->data + (vector->length - 1)),
-               sizeof(VECTOR_TYPE));
-    }
     vector->length--;
+    return vector->data[vector->length];
 }
 
 /// @brief Pop a value from the vector at a specific index
 /// @param vector pointer to the vector
 /// @param index index to pop
-/// @param value pointer to store the value
-void TYPE(_pop_at)(STYPE *vector, size_t index, VECTOR_TYPE *value) {
+VECTOR_TYPE TYPE(_pop_at)(STYPE *vector, size_t index) {
     if (vector->length <= index) {
         PANIC("Index out of bounds");
     }
-    if (value != NULL) {
-        memcpy(value, (vector->data + index), sizeof(VECTOR_TYPE));
-    }
+    VECTOR_TYPE result = vector->data[index];
     memmove(vector->data + index, vector->data + (index + 1),
             (vector->length - index - 1) * sizeof(VECTOR_TYPE));
     vector->length--;
+    return result;
 }
 
 void TYPE(_print_internal)(STYPE *vector, bool beautify, bool logger,

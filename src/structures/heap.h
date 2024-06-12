@@ -20,7 +20,6 @@ typedef struct {
 // private functions
 MinHeap _heap_create(size_t stride);
 void _heap_push(MinHeap *heap, int64_t priority, void *value);
-void _heap_pop(int line, const char *file, MinHeap *heap, void *value);
 
 #define heap_create(type) _heap_create(sizeof(type))
 
@@ -39,4 +38,4 @@ void heap_free(MinHeap *heap);
 /// @brief Pop a value from the heap
 /// @param heap pointer to the heap
 /// @param value pointer to store the value
-#define heap_pop(heap, value) _heap_pop(__LINE__, __FILE__, heap, value);
+void heap_pop(MinHeap *heap, void *value);

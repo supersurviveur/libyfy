@@ -67,9 +67,9 @@ void _heap_push(MinHeap *heap, int64_t priority, void *value) {
     heap->length++;
 }
 
-void _heap_pop(int line, const char *file, MinHeap *heap, void *value) {
+void heap_pop(MinHeap *heap, void *value) {
     if (heap->length == 0) {
-        PANIC_AT(line, file, "MinHeap is empty");
+        PANIC("MinHeap is empty");
     }
     memcpy(value, heap->data, heap->stride);
 

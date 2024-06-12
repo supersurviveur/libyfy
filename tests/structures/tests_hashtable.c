@@ -1,80 +1,128 @@
-#include "libyfy.h"
+#define KEY_TYPE int
+#define VALUE_TYPE int
+#include "structures/hashmap.h"
+
+typedef char *charp;
+#define KEY_TYPE charp
+#define VALUE_TYPE int
+#include "structures/hashmap.h"
 
 typedef struct {
     int a;
     int b;
-} TestHashtable;
+} TestHashmap;
 
-uint32_t test_hashtable_hash(void *key) { return ((TestHashtable *)key)->a; }
+#define KEY_TYPE TestHashmap
+#define VALUE_TYPE TestHashmap
+#include "structures/hashmap.h"
 
-void tests_hashtable() {
-    HashTable *table = hashtable_create(int, int, int_hash);
-    hashtable_set(table, 1, 2);
-    hashtable_set(table, 2, 3);
-    hashtable_set(table, 3, 4);
-    ASSERT(hashtable_get(table, 1, int) == 2);
-    ASSERT(hashtable_get(table, 2, int) == 3);
-    ASSERT(hashtable_get(table, 3, int) == 4);
-    ASSERT(hashtable_contains(table, 1));
-    ASSERT(hashtable_contains(table, 2));
-    ASSERT(hashtable_contains(table, 3));
-    ASSERT(!hashtable_contains(table, 4));
+uint32_t test_hashmap_hash(TestHashmap key) { return key.a; }
 
-    hashtable_set(table, 2, 4);
-    ASSERT(hashtable_get(table, 2, int) == 4);
-    ASSERT(hashtable_get(table, 3, int) == 4);
-    ASSERT(hashtable_contains(table, 2));
+bool test_hashmap_comp(TestHashmap a, TestHashmap b) {
+    return a.a == b.a && a.b == b.b;
+}
 
-    hashtable_delete(table, 2);
-    ASSERT(!hashtable_contains(table, 2));
-    ASSERT(hashtable_contains(table, 3));
+bool char_comp(char *a, char *b) { return strcmp(a, b) == 0; }
 
-    hashtable_free(table);
+bool int_comp(int a, int b) { return a == b; }
 
-    table = hashtable_create(TestHashtable, TestHashtable, test_hashtable_hash);
-    hashtable_set(table, ((TestHashtable){1, 2}), ((TestHashtable){3, 4}));
-    hashtable_set(table, ((TestHashtable){2, 3}), ((TestHashtable){4, 5}));
-    hashtable_set(table, ((TestHashtable){3, 4}), ((TestHashtable){5, 6}));
-    ASSERT(hashtable_get(table, ((TestHashtable){1, 2}), TestHashtable).a == 3);
-    ASSERT(hashtable_get(table, ((TestHashtable){2, 3}), TestHashtable).a == 4);
-    ASSERT(hashtable_get(table, ((TestHashtable){3, 4}), TestHashtable).a == 5);
-    ASSERT(hashtable_get(table, ((TestHashtable){1, 2}), TestHashtable).b == 4);
-    ASSERT(hashtable_get(table, ((TestHashtable){2, 3}), TestHashtable).b == 5);
-    ASSERT(hashtable_get(table, ((TestHashtable){3, 4}), TestHashtable).b == 6);
-    ASSERT(hashtable_contains(table, ((TestHashtable){1, 2})));
-    ASSERT(hashtable_contains(table, ((TestHashtable){2, 3})));
-    ASSERT(hashtable_contains(table, ((TestHashtable){3, 4})));
+void tests_hashmap() {
+    HashMap_int_int map = hashmap_int_int_create(int_hash, int_comp);
+    hashmap_int_int_set(&map, 1, 2);
+    hashmap_int_int_set(&map, 2, 3);
+    hashmap_int_int_set(&map, 3, 4);
+    ASSERT(*hashmap_int_int_get(&map, 1) == 2);
+    ASSERT(*hashmap_int_int_get(&map, 2) == 3);
+    ASSERT(*hashmap_int_int_get(&map, 3) == 4);
+    ASSERT(hashmap_int_int_contains(&map, 1));
+    ASSERT(hashmap_int_int_contains(&map, 2));
+    ASSERT(hashmap_int_int_contains(&map, 3));
+    ASSERT(!hashmap_int_int_contains(&map, 4));
+
+    hashmap_int_int_set(&map, 2, 4);
+    ASSERT(*hashmap_int_int_get(&map, 2) == 4);
+    ASSERT(*hashmap_int_int_get(&map, 3) == 4);
+    ASSERT(hashmap_int_int_contains(&map, 2));
+
+    hashmap_int_int_delete(&map, 2);
+    ASSERT(!hashmap_int_int_contains(&map, 2));
+    ASSERT(hashmap_int_int_contains(&map, 3));
+
+    hashmap_int_int_free(&map);
+
+    HashMap_TestHashmap_TestHashmap map2 =
+        hashmap_TestHashmap_TestHashmap_create(test_hashmap_hash,
+                                               test_hashmap_comp);
+    hashmap_TestHashmap_TestHashmap_set(&map2, ((TestHashmap){1, 2}),
+                                        ((TestHashmap){3, 4}));
+    hashmap_TestHashmap_TestHashmap_set(&map2, ((TestHashmap){2, 3}),
+                                        ((TestHashmap){4, 5}));
+    hashmap_TestHashmap_TestHashmap_set(&map2, ((TestHashmap){3, 4}),
+                                        ((TestHashmap){5, 6}));
+    ASSERT(
+        hashmap_TestHashmap_TestHashmap_get(&map2, ((TestHashmap){1, 2}))->a ==
+        3);
+    ASSERT(
+        hashmap_TestHashmap_TestHashmap_get(&map2, ((TestHashmap){2, 3}))->a ==
+        4);
+    ASSERT(
+        hashmap_TestHashmap_TestHashmap_get(&map2, ((TestHashmap){3, 4}))->a ==
+        5);
+    ASSERT(
+        hashmap_TestHashmap_TestHashmap_get(&map2, ((TestHashmap){1, 2}))->b ==
+        4);
+    ASSERT(
+        hashmap_TestHashmap_TestHashmap_get(&map2, ((TestHashmap){2, 3}))->b ==
+        5);
+    ASSERT(
+        hashmap_TestHashmap_TestHashmap_get(&map2, ((TestHashmap){3, 4}))->b ==
+        6);
+    ASSERT(
+        hashmap_TestHashmap_TestHashmap_contains(&map2, ((TestHashmap){1, 2})));
+    ASSERT(
+        hashmap_TestHashmap_TestHashmap_contains(&map2, ((TestHashmap){2, 3})));
+    ASSERT(
+        hashmap_TestHashmap_TestHashmap_contains(&map2, ((TestHashmap){3, 4})));
 
     // Try conflicting hash
-    hashtable_set(table, ((TestHashtable){1, 3}), ((TestHashtable){10, 11}));
-    ASSERT(hashtable_get(table, ((TestHashtable){1, 2}), TestHashtable).a == 3);
-    ASSERT(hashtable_get(table, ((TestHashtable){1, 3}), TestHashtable).a ==
-           10);
-    ASSERT(hashtable_get(table, ((TestHashtable){1, 2}), TestHashtable).b == 4);
-    ASSERT(hashtable_get(table, ((TestHashtable){1, 3}), TestHashtable).b ==
-           11);
+    hashmap_TestHashmap_TestHashmap_set(&map2, ((TestHashmap){1, 3}),
+                                        ((TestHashmap){10, 11}));
+    ASSERT(
+        hashmap_TestHashmap_TestHashmap_get(&map2, ((TestHashmap){1, 2}))->a ==
+        3);
+    ASSERT(
+        hashmap_TestHashmap_TestHashmap_get(&map2, ((TestHashmap){1, 3}))->a ==
+        10);
+    ASSERT(
+        hashmap_TestHashmap_TestHashmap_get(&map2, ((TestHashmap){1, 2}))->b ==
+        4);
+    ASSERT(
+        hashmap_TestHashmap_TestHashmap_get(&map2, ((TestHashmap){1, 3}))->b ==
+        11);
 
-    ASSERT(hashtable_contains(table, ((TestHashtable){1, 2})));
-    ASSERT(hashtable_contains(table, ((TestHashtable){1, 3})));
+    ASSERT(
+        hashmap_TestHashmap_TestHashmap_contains(&map2, ((TestHashmap){1, 2})));
+    ASSERT(
+        hashmap_TestHashmap_TestHashmap_contains(&map2, ((TestHashmap){1, 3})));
 
-    hashtable_free(table);
+    hashmap_TestHashmap_TestHashmap_free(&map2);
 
     // Test others hash functions
-    table = hashtable_create(char *, int, cstr_hash);
-    hashtable_set(table, &"a", 1);
+    HashMap_charp_int map3 = hashmap_charp_int_create(cstr_hash, char_comp);
+    hashmap_charp_int_set(&map3, "a", 1);
 
-    ASSERT(hashtable_get(table, &"a", int) == 1);
-    ASSERT(hashtable_contains(table, &"a"));
-    ASSERT(!hashtable_contains(table, &"b"));
-    hashtable_set(table, &"ab", 2);
-    ASSERT(hashtable_get(table, &"ab", int) == 2);
-    ASSERT(hashtable_get(table, &"a", int) == 1);
-    ASSERT(hashtable_contains(table, &"ab"));
-    ASSERT(!hashtable_contains(table, &"b"));
+    ASSERT(*hashmap_charp_int_get(&map3, "a") == 1);
+    ASSERT(hashmap_charp_int_contains(&map3, "a"));
+    ASSERT(!hashmap_charp_int_contains(&map3, "b"));
+    hashmap_charp_int_set(&map3, "ab", 2);
+    ASSERT(*hashmap_charp_int_get(&map3, "ab") == 2);
+    ASSERT(*hashmap_charp_int_get(&map3, "a") == 1);
+    ASSERT(hashmap_charp_int_contains(&map3, "ab"));
+    ASSERT(!hashmap_charp_int_contains(&map3, "b"));
 
-    hashtable_delete(table, &"a");
-    ASSERT(!hashtable_contains(table, &"a"));
-    ASSERT(hashtable_contains(table, &"ab"));
+    hashmap_charp_int_delete(&map3, "a");
+    ASSERT(!hashmap_charp_int_contains(&map3, "a"));
+    ASSERT(hashmap_charp_int_contains(&map3, "ab"));
 
-    hashtable_free(table);
-}
+    hashmap_charp_int_free(&map3);
+};

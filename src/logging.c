@@ -3,7 +3,8 @@
 const char *log_level_names[] = {"TRACE", "DEBUG", "INFO",
                                  "WARN",  "ERROR", "FATAL"};
 const char *log_level_colors[] = {
-    BLUE, GREEN, CYAN, FG_RGB(255, 150, 0), RED, FG_RGB(255, 50, 50)};
+    FG_RGB(0, 100, 140), GREEN, CYAN,
+    FG_RGB(255, 150, 0), RED,   FG_RGB(255, 50, 50)};
 const __uint16_t MAX_MESSAGE_SIZE = 1024;
 
 // Return time in format HH:MM:SS:µs

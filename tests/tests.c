@@ -4,7 +4,7 @@
 
 int main() {
     tests_vector();
-    tests_hashtable();
+    tests_hashmap();
     tests_linkedlist();
     tests_heap();
     tests_binarytree();
