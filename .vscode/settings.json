@@ -28,7 +28,15 @@
         "random": "c",
         "map": "c",
         "format": "c",
-        "thread": "c"
+        "thread": "c",
+        "charconv": "c",
+        "optional": "c",
+        "ratio": "c",
+        "system_error": "c",
+        "functional": "c",
+        "tuple": "c",
+        "type_traits": "c",
+        "utility": "c"
     },
     "C_Cpp.default.compilerArgs": [
         "-DVECTOR_TYPE=int",
