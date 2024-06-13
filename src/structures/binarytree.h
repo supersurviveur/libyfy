@@ -23,7 +23,7 @@ void binarytree_free(BinaryTree *node);
         _binarytree_create(sizeof(typeof(value)), &tmp); \
     })
 
-size_t binarytree_height(BinaryTree *tree);
+int64_t binarytree_height(BinaryTree *tree);
 
 /// @brief Print a binary tree
 /// @param tree The tree to print

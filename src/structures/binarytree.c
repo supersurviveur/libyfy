@@ -26,7 +26,7 @@ void binarytree_free(BinaryTree *node) {
     free(node);
 }
 
-uint64_t binarytree_height(BinaryTree *tree) {
+int64_t binarytree_height(BinaryTree *tree) {
     if (tree == NULL) return -1;
     int a = binarytree_height(tree->left);
     int b = binarytree_height(tree->right);

@@ -19,8 +19,6 @@ typedef struct {
 } LinkedList;
 
 // Private functions
-Node *_linkedlist_create_node(LinkedList *list, void *data);
-void _linkedlist_free_node(Node *node);
 LinkedList *_linkedlist_create(uint32_t type_size);
 void _linkedlist_push(LinkedList *list, void *data);
 void _linkedlist_unshift(LinkedList *list, void *data);

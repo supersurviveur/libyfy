@@ -8,8 +8,13 @@
 
 #include "utils.h"
 
+#ifdef VECTOR_NAME
+#define TYPE(name) CONCAT(vec_, VECTOR_NAME, name)
+#define STYPE CONCAT(Vec_, VECTOR_NAME, )
+#else
 #define TYPE(name) CONCAT(vec_, VECTOR_TYPE, name)
 #define STYPE CONCAT(Vec_, VECTOR_TYPE, )
+#endif
 
 #include <malloc.h>
 #include <memory.h>
@@ -178,7 +183,7 @@ bool TYPE(_contains)(STYPE *vector, VECTOR_TYPE value) {
 /// @param vector pointer to the vector
 /// @param value value to check
 /// @return `int32_t` - index of the value, -1 if not found
-int32_t TYPE(_index_of)(STYPE *vector, VECTOR_TYPE value) {
+int64_t TYPE(_index_of)(STYPE *vector, VECTOR_TYPE value) {
     for (size_t i = 0; i < vector->length; i++) {
         if (memcmp(vector->data + i, &value, sizeof(VECTOR_TYPE)) == 0) {
             return i;
@@ -246,4 +251,7 @@ void TYPE(_quick_sort)(STYPE *vector, int32_t (*compare)(const VECTOR_TYPE *,
 }
 
 #undef VECTOR_TYPE
+#undef VECTOR_NAME
+#undef STYPE
+#undef TYPE
 #endif

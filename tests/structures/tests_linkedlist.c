@@ -27,7 +27,5 @@ void tests_linkedlist() {
     ASSERT(data == 1);
     ASSERT(list->length == 1);
 
-
-
     linkedlist_free(list);
 }

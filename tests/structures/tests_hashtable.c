@@ -14,6 +14,7 @@ typedef struct {
 
 #define KEY_TYPE TestHashmap
 #define VALUE_TYPE TestHashmap
+#define HASHMAP_NAME 3
 #include "structures/hashmap.h"
 
 uint32_t test_hashmap_hash(TestHashmap key) { return key.a; }
@@ -50,62 +51,62 @@ void tests_hashmap() {
 
     hashmap_int_int_free(&map);
 
-    HashMap_TestHashmap_TestHashmap map2 =
-        hashmap_TestHashmap_TestHashmap_create(test_hashmap_hash,
+    HashMap_3 map2 =
+        hashmap_3_create(test_hashmap_hash,
                                                test_hashmap_comp);
-    hashmap_TestHashmap_TestHashmap_set(&map2, ((TestHashmap){1, 2}),
+    hashmap_3_set(&map2, ((TestHashmap){1, 2}),
                                         ((TestHashmap){3, 4}));
-    hashmap_TestHashmap_TestHashmap_set(&map2, ((TestHashmap){2, 3}),
+    hashmap_3_set(&map2, ((TestHashmap){2, 3}),
                                         ((TestHashmap){4, 5}));
-    hashmap_TestHashmap_TestHashmap_set(&map2, ((TestHashmap){3, 4}),
+    hashmap_3_set(&map2, ((TestHashmap){3, 4}),
                                         ((TestHashmap){5, 6}));
     ASSERT(
-        hashmap_TestHashmap_TestHashmap_get(&map2, ((TestHashmap){1, 2}))->a ==
+        hashmap_3_get(&map2, ((TestHashmap){1, 2}))->a ==
         3);
     ASSERT(
-        hashmap_TestHashmap_TestHashmap_get(&map2, ((TestHashmap){2, 3}))->a ==
+        hashmap_3_get(&map2, ((TestHashmap){2, 3}))->a ==
         4);
     ASSERT(
-        hashmap_TestHashmap_TestHashmap_get(&map2, ((TestHashmap){3, 4}))->a ==
+        hashmap_3_get(&map2, ((TestHashmap){3, 4}))->a ==
         5);
     ASSERT(
-        hashmap_TestHashmap_TestHashmap_get(&map2, ((TestHashmap){1, 2}))->b ==
+        hashmap_3_get(&map2, ((TestHashmap){1, 2}))->b ==
         4);
     ASSERT(
-        hashmap_TestHashmap_TestHashmap_get(&map2, ((TestHashmap){2, 3}))->b ==
+        hashmap_3_get(&map2, ((TestHashmap){2, 3}))->b ==
         5);
     ASSERT(
-        hashmap_TestHashmap_TestHashmap_get(&map2, ((TestHashmap){3, 4}))->b ==
+        hashmap_3_get(&map2, ((TestHashmap){3, 4}))->b ==
         6);
     ASSERT(
-        hashmap_TestHashmap_TestHashmap_contains(&map2, ((TestHashmap){1, 2})));
+        hashmap_3_contains(&map2, ((TestHashmap){1, 2})));
     ASSERT(
-        hashmap_TestHashmap_TestHashmap_contains(&map2, ((TestHashmap){2, 3})));
+        hashmap_3_contains(&map2, ((TestHashmap){2, 3})));
     ASSERT(
-        hashmap_TestHashmap_TestHashmap_contains(&map2, ((TestHashmap){3, 4})));
+        hashmap_3_contains(&map2, ((TestHashmap){3, 4})));
 
     // Try conflicting hash
-    hashmap_TestHashmap_TestHashmap_set(&map2, ((TestHashmap){1, 3}),
+    hashmap_3_set(&map2, ((TestHashmap){1, 3}),
                                         ((TestHashmap){10, 11}));
     ASSERT(
-        hashmap_TestHashmap_TestHashmap_get(&map2, ((TestHashmap){1, 2}))->a ==
+        hashmap_3_get(&map2, ((TestHashmap){1, 2}))->a ==
         3);
     ASSERT(
-        hashmap_TestHashmap_TestHashmap_get(&map2, ((TestHashmap){1, 3}))->a ==
+        hashmap_3_get(&map2, ((TestHashmap){1, 3}))->a ==
         10);
     ASSERT(
-        hashmap_TestHashmap_TestHashmap_get(&map2, ((TestHashmap){1, 2}))->b ==
+        hashmap_3_get(&map2, ((TestHashmap){1, 2}))->b ==
         4);
     ASSERT(
-        hashmap_TestHashmap_TestHashmap_get(&map2, ((TestHashmap){1, 3}))->b ==
+        hashmap_3_get(&map2, ((TestHashmap){1, 3}))->b ==
         11);
 
     ASSERT(
-        hashmap_TestHashmap_TestHashmap_contains(&map2, ((TestHashmap){1, 2})));
+        hashmap_3_contains(&map2, ((TestHashmap){1, 2})));
     ASSERT(
-        hashmap_TestHashmap_TestHashmap_contains(&map2, ((TestHashmap){1, 3})));
+        hashmap_3_contains(&map2, ((TestHashmap){1, 3})));
 
-    hashmap_TestHashmap_TestHashmap_free(&map2);
+    hashmap_3_free(&map2);
 
     // Test others hash functions
     HashMap_charp_int map3 = hashmap_charp_int_create(cstr_hash, char_comp);

@@ -8,7 +8,11 @@
 
 #include "utils.h"
 
+#ifdef HASHMAP_NAME
+#define TYPE__(pred, name, a, b) CONCAT(pred, HASHMAP_NAME, name)
+#else
 #define TYPE__(pred, name, a, b) CONCAT(pred, a##_##b, name)
+#endif
 #define TYPE_(pred, name, a, b) TYPE__(pred, name, a, b)
 #define TYPE(name) TYPE_(hashmap_, name, KEY_TYPE, VALUE_TYPE)
 #define TS_TYPE TYPE_(HashMap_, , KEY_TYPE, VALUE_TYPE)
@@ -33,7 +37,7 @@ typedef struct {
     uint32_t length;
     uint32_t capacity;
     uint32_t (*hash)(KEY_TYPE);
-    bool (*comp)(KEY_TYPE, KEY_TYPE);
+    bool (*equals)(KEY_TYPE, KEY_TYPE);
     LinkedList **buckets;
 } TS_TYPE;
 
@@ -42,11 +46,11 @@ typedef struct {
 /// @param value_type type of the value
 /// @param hash hash function for the key
 TS_TYPE TYPE(_create)(uint32_t (*hash)(KEY_TYPE),
-                      bool (*comp)(KEY_TYPE, KEY_TYPE)) {
+                      bool (*equals)(KEY_TYPE, KEY_TYPE)) {
     TS_TYPE table = {
         .capacity = HASHTABLE_DEFAULT_CAPACITY,
         .hash = hash,
-        .comp = comp,
+        .equals = equals,
         .length = 0,
         .buckets = malloc(sizeof(LinkedList *) * HASHTABLE_DEFAULT_CAPACITY)};
     if (table.buckets == NULL) {
@@ -78,7 +82,7 @@ void TYPE(_set)(TS_TYPE *table, KEY_TYPE key, VALUE_TYPE value) {
     LinkedListIterator iterator = linkedlist_iterator(bucket);
     NS_TYPE *node;
     while ((node = linkedlist_iterator_next(&iterator)) != NULL) {
-        if (table->comp(node->key, key)) {
+        if (table->equals(node->key, key)) {
             node->value = value;  // Overwrite the value
             return;
         }
@@ -123,7 +127,7 @@ VALUE_TYPE *TYPE(_get)(TS_TYPE *table, KEY_TYPE key) {
     LinkedListIterator iterator = linkedlist_iterator(bucket);
     NS_TYPE *node;
     while ((node = linkedlist_iterator_next(&iterator)) != NULL) {
-        if (table->comp(node->key, key)) {
+        if (table->equals(node->key, key)) {
             return &node->value;
         }
     }
@@ -140,7 +144,7 @@ bool TYPE(_contains)(TS_TYPE *table, KEY_TYPE key) {
     LinkedListIterator iterator = linkedlist_iterator(bucket);
     NS_TYPE *node;
     while ((node = linkedlist_iterator_next(&iterator)) != NULL) {
-        if (table->comp(node->key, key)) {
+        if (table->equals(node->key, key)) {
             return true;
         }
     }
@@ -156,7 +160,7 @@ void TYPE(_delete)(TS_TYPE *table, KEY_TYPE key) {
     LinkedListIterator iterator = linkedlist_iterator(bucket);
     NS_TYPE *node;
     while ((node = linkedlist_iterator_next(&iterator)) != NULL) {
-        if (table->comp(node->key, key)) {
+        if (table->equals(node->key, key)) {
             linkedlist_remove(bucket, *node);
             table->length--;
             return;
@@ -181,5 +185,11 @@ uint32_t cstr_hash(char *key) {
 #undef KEY_TYPE
 #undef VALUE_TYPE
 #undef HASHMAP_COMP
+#undef HASHMAP_NAME
+#undef TYPE__
+#undef TYPE_
+#undef TYPE
+#undef TS_TYPE
+#undef NS_TYPE
 #endif
 #endif
